@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
+import { useState } from "react";
 
 export default function GenerateImagePage() {
   const [prompt, setPrompt] = useState("");
@@ -9,18 +9,18 @@ export default function GenerateImagePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     setIsLoading(true);
-    setError(null);
     setImageSrc(null);
+    setError(null);
     setPrompt("");
+
     try {
       const response = await fetch("/api/generate-image", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt }),
       });
 
@@ -30,10 +30,10 @@ export default function GenerateImagePage() {
         throw new Error(data.error || "Something went wrong");
       }
 
-      //convert the base64 string to a blob
-      setImageSrc(`data:image/png;base64,${data.image}`);
+      //convert the base64 string to image
+      setImageSrc(`data:image/png;base64,${data}`);
     } catch (error) {
-      console.error("Error generating image", error);
+      console.error("Error generating image:", error);
       setError(
         error instanceof Error
           ? error.message
