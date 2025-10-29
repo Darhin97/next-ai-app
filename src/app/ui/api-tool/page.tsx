@@ -3,14 +3,15 @@
 import { useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import type { ChatMessage } from "@/app/api/multiple-tools/route";
+import { ChatMessage } from "@/app/api/api-tool/route";
+import { WeatherCard } from "@/app/ui/api-tool/weather-card";
 
-export default function MultipleToolsPage() {
+export default function ApiToolPage() {
   const [input, setInput] = useState("");
 
   const { messages, sendMessage, status, error, stop } = useChat<ChatMessage>({
     transport: new DefaultChatTransport({
-      api: "/api/multiple-tools",
+      api: "/api/api-tool",
     }),
   });
 
@@ -42,66 +43,6 @@ export default function MultipleToolsPage() {
                     {part.text}
                   </div>
                 );
-              case "tool-getLocation":
-                switch (part.state) {
-                  case "input-streaming":
-                    return (
-                      <div
-                        key={`${message.id}-getLocation-${index}`}
-                        className="bg-zinc-800/50 border border-zinc-700 p-2 rounded mt-1 mb-2"
-                      >
-                        <div className="text-sm text-zinc-500">
-                          📍 Receiving location request...
-                        </div>
-                        <pre className="text-xs text-zinc-600 mt-1">
-                          {JSON.stringify(part.input, null, 2)}
-                        </pre>
-                      </div>
-                    );
-
-                  case "input-available":
-                    return (
-                      <div
-                        key={`${message.id}-getLocation-${index}`}
-                        className="bg-zinc-800/50 border border-zinc-700 p-2 rounded mt-1 mb-2"
-                      >
-                        <div className="text-sm text-zinc-400">
-                          📍 Getting location for {part.input.name}...
-                        </div>
-                      </div>
-                    );
-
-                  case "output-available":
-                    return (
-                      <div
-                        key={`${message.id}-getLocation-${index}`}
-                        className="bg-zinc-800/50 border border-zinc-700 p-2 rounded mt-1 mb-2"
-                      >
-                        <div className="text-sm text-zinc-400">
-                          📍 Location found
-                        </div>
-                        <div className="text-sm text-zinc-300">
-                          {part.output}
-                        </div>
-                      </div>
-                    );
-
-                  case "output-error":
-                    return (
-                      <div
-                        key={`${message.id}-getLocation-${index}`}
-                        className="bg-zinc-800/50 border border-zinc-700 p-2 rounded mt-1 mb-2"
-                      >
-                        <div className="text-sm text-red-400">
-                          Error: {part.errorText}
-                        </div>
-                      </div>
-                    );
-
-                  default:
-                    return null;
-                }
-
               case "tool-getWeather":
                 switch (part.state) {
                   case "input-streaming":
@@ -130,14 +71,23 @@ export default function MultipleToolsPage() {
 
                   case "output-available":
                     return (
+                      // <div
+                      //   key={`${message.id}-getWeather-${index}`}
+                      //   className="bg-zinc-800/50 border border-zinc-700 p-2 rounded mt-1 mb-2"
+                      // >
+                      //   <div className="text-sm text-zinc-400">🌤️ Weather</div>
+                      //   <div className="text-sm text-zinc-300">
+                      //     <div>{part.output.location.name}</div>
+                      //     <div>{part.output.current.temp_c}</div>
+                      //     <div>{part.output.current.condition.text}</div>
+                      //   </div>
+                      // </div>
+
                       <div
                         key={`${message.id}-getWeather-${index}`}
-                        className="bg-zinc-800/50 border border-zinc-700 p-2 rounded mt-1 mb-2"
+                        className="mt-1 mb-2"
                       >
-                        <div className="text-sm text-zinc-400">🌤️ Weather</div>
-                        <div className="text-sm text-zinc-300">
-                          <div>{part.output}</div>
-                        </div>
+                        <WeatherCard weatherData={part.output} />
                       </div>
                     );
 

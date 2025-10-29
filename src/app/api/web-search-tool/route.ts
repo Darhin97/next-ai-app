@@ -4,29 +4,30 @@ import {
   UIMessage,
   InferUITools,
   UIDataTypes,
-  tool,
   stepCountIs,
 } from "ai";
 import { openai } from "@ai-sdk/openai";
-import { z } from "zod";
+// import { anthropic } from "@ai-sdk/anthropic";
 
 //special fxn given to an ai to address its limitation of its training data
 const tools = {
-  getWeather: tool({
-    description: "Get the weather for a location",
-    inputSchema: z.object({
-      city: z.string().describe("The city to get the weather for"),
-    }),
-    execute: async ({ city }) => {
-      if (city === "Gotham city ") {
-        return "70F and cloudy";
-      } else if (city === "Metropolis") {
-        return "80F and sunny";
-      } else {
-        return "Unknown";
-      }
-    },
-  }),
+  web_search_preview: openai.tools.webSearch({}),
+
+  // anthropic
+  // web_search: anthropic.tools.webSearch_20250305({
+  //   maxUses: 1,
+  // }),
+};
+
+export type WebSearchSource = {
+  title: string;
+  url: string;
+  snippet: string;
+};
+
+export type WebSearchResult = {
+  sources?: WebSearchSource[];
+  query?: string;
 };
 
 export type ChatTools = InferUITools<typeof tools>;
@@ -38,7 +39,7 @@ export async function POST(req: Request) {
 
     const results = streamText({
       // recommend to use gpt-5-mini for tools
-      model: openai("gpt-4.1-nano"),
+      model: openai.responses("gpt-4.1-mini"),
       messages: convertToModelMessages(messages),
       tools: tools,
       stopWhen: stepCountIs(2),

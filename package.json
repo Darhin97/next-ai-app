@@ -9,9 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^2.0.38",
     "@ai-sdk/openai": "^2.0.53",
     "@ai-sdk/react": "^2.0.78",
+    "@imagekit/next": "^2.1.3",
     "ai": "^5.0.78",
+    "imagekit": "^6.0.0",
     "next": "15.4.5",
     "react": "19.1.0",
     "react-dom": "19.1.0",

@@ -12,35 +12,33 @@ import { z } from "zod";
 
 //special fxn given to an ai to address its limitation of its training data
 const tools = {
-  getLocation: tool({
-    description: "Get the location of a user ",
-    inputSchema: z.object({
-      name: z.string().describe("The name of the user"),
-    }),
-    execute: async ({ name }) => {
-      if (name === "Bruce Wayne") {
-        return "Gotham city";
-      } else if (name === "Clark Kent") {
-        return "Metropolis";
-      } else {
-        return "Unknown";
-      }
-    },
-  }),
   getWeather: tool({
     description: "Get the weather for a location",
     inputSchema: z.object({
       city: z.string().describe("The city to get the weather for"),
     }),
     execute: async ({ city }) => {
-      const pattern = /gotham city/i;
-      if (pattern.test(city)) {
-        return "70F and cloudy";
-      } else if (city === "Metropolis") {
-        return "80F and sunny";
-      } else {
-        return "Unknown";
-      }
+      const url = `http://api.weatherapi.com/v1/current.json?key=${process.env.WEATHER_API_KEY}&q=${city}`;
+      const res = await fetch(url);
+
+      const data = await res.json();
+
+      const weatherData = {
+        location: {
+          name: data.location.name,
+          country: data.location.country,
+          localtime: data.location.localtime,
+        },
+        current: {
+          temp_c: data.current.temp_c,
+          condition: {
+            text: data.current.condition.text,
+            code: data.current.condition.code,
+          },
+        },
+      };
+
+      return weatherData;
     },
   }),
 };
@@ -57,7 +55,7 @@ export async function POST(req: Request) {
       model: openai("gpt-4.1-nano"),
       messages: convertToModelMessages(messages),
       tools: tools,
-      stopWhen: stepCountIs(3),
+      stopWhen: stepCountIs(2),
     });
 
     return results.toUIMessageStreamResponse();
