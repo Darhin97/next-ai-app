@@ -18,6 +18,8 @@ function buildTransformationUrl(
 }
 
 export default function ClientSideToolsPage() {
+  // this component is a simple chat interface with a text input and a submit button
+  // processing images and changing backgrounds are done using client-side tools
   const [input, setInput] = useState("");
   const [files, setFiles] = useState<FileList | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
